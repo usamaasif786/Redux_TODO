@@ -28,3 +28,10 @@ export const removeTodo = () => {
     type: "REMOVE_TODO",
   };
 };
+
+// export const loadTodo = (todos) => {
+//   return {
+//     type: "LOAD_TODO",
+//     payload: todos,
+//   };
+// };

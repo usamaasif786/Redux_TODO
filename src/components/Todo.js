@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addTodo, deleteTodo, removeTodo, editTodo } from "../actions/index";
+import "../components/component.css";
 const Todo = () => {
   const [inputData, setInputData] = useState("");
   const [editItemId, setEditItemId] = useState(null);
@@ -16,6 +17,28 @@ const Todo = () => {
     dispatch(editTodo(id, newData));
     setEditItemId(null);
   };
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      // Check if Enter key is pressed
+      dispatch(addTodo(inputData));
+      setInputData(""); // Clear the input field after adding the item
+    }
+  };
+
+  /////////// To store our data into Local Database /////
+  useEffect(() => {
+    const storedList = localStorage.getItem("todoList");
+    if (storedList) {
+      dispatch({ type: "LOAD_TODO", payload: JSON.parse(storedList) });
+    }
+  }, [dispatch]);
+
+  // Save data to localStorage whenever the todo list changes
+  useEffect(() => {
+    localStorage.setItem("todoList", JSON.stringify(list));
+  }, [list]);
+
   return (
     <>
       <div className="main-div">
@@ -27,16 +50,25 @@ const Todo = () => {
           {/* ////////////////  Add List //// */}
 
           <div className="addItems">
-            <input
-              type="text"
-              placeholder="Add Items..."
-              value={inputData}
-              onChange={(event) => setInputData(event.target.value)}
-            />
-            <i
-              className="fa fa-plus add-btn"
-              onClick={() => dispatch(addTodo(inputData), setInputData(""))}
-            ></i>
+            <div className="input-with-icon">
+              <input
+                type="text"
+                placeholder="Add Items..."
+                value={inputData}
+                onChange={(event) => setInputData(event.target.value)}
+                onKeyPress={handleKeyPress} // Call the handleKeyPress function on key press
+              />
+              <i
+                className="fa fa-plus add-btn"
+                onClick={() => {
+                  if (inputData.trim() !== "") {
+                    dispatch(addTodo(inputData));
+                    setInputData("");
+                  }
+                }}
+                // onClick={() => dispatch(addTodo(inputData), setInputData(""))}
+              ></i>
+            </div>
           </div>
 
           {/* ////////////////  Show List //// */}
@@ -92,7 +124,9 @@ const Todo = () => {
                     <i
                       className="far fa-trash-alt add-btn"
                       title="Delete Item"
-                      onClick={() => dispatch(deleteTodo(element.id))}
+                      onClick={() =>
+                        dispatch(deleteTodo(element.id), setInputData(""))
+                      }
                     ></i>
                   </div>
                 </div>
@@ -107,7 +141,7 @@ const Todo = () => {
               data-sm-link-text="remove-All"
               onClick={() => dispatch(removeTodo())}
             >
-              <span>Check List</span>
+              <span>Delete All List</span>
             </button>
           </div>
         </div>

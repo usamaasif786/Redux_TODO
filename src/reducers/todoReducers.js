@@ -37,6 +37,12 @@ const todoReducers = (state = initialData, action) => {
         ...state,
         list: [],
       };
+    // case "LOAD_TODO": // New case for loading todos from local storage
+    //   return {
+    //     ...state,
+    //     list: action.payload,
+    //   };
+
     default:
       return state;
   }
